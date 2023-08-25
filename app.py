@@ -1,12 +1,8 @@
 import math
 import sys
 import threading
-from ctypes import POINTER, cast
 
 import cv2
-import face_recognition
-from comtypes import CLSCTX_ALL
-from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 
 1#!/usr/bin/env python
 # -*- coding: utf-8 -*-
@@ -29,13 +25,8 @@ import time
 
 import numpy
 import pygame
-# import pydbus
 songList = None
 channel = None
-# bus = pydbus.SystemBus()
-#
-# adapter = bus.get('org.bluez', '/org/bluez/hci0')
-# mngr = bus.get('org.bluez', '/')
 
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
@@ -68,40 +59,7 @@ def get_args():
 
     return args
 
-def playMusic():
-    music_dir = "C:\\Users\\aweso\\my music"
-    songs = os.listdir(music_dir)
-    numpy.random.shuffle(songs)
-    # list_connected_devices()
-    playlist(songs, music_dir)
-# def list_connected_devices():
-#     mngd_objs = mngr.GetManagedObjects()
-#     for path in mngd_objs:
-#         con_state = mngd_objs[path].get('org.bluez.Device1', {}).get('Connected', False)
-#         if con_state:
-#             addr = mngd_objs[path].get('org.bluez.Device1', {}).get('Address')
-#             name = mngd_objs[path].get('org.bluez.Device1', {}).get('Name')
-#             print(f'Device {name} [{addr}] is connected')
 
-
-def playlist(songs, music_dir):
-    print(songs)
-    songList = songs
-    pygame.mixer.pre_init(44100, -16, 2, 2048)
-    pygame.init()
-    pygame.mixer.init()
-    songno = 0
-    pygame.mixer.set_num_channels(8)
-    voice = pygame.mixer.Channel(5)
-    channel = voice
-    for song in songs:
-        sound = pygame.mixer.Sound(os.path.join(music_dir, song))
-        playingsong = os.path.join(music_dir, song)
-        # sound.set_volume(0.1)
-        voice.play(sound)
-        while voice.get_busy():
-            time.sleep(1)
-        songno = songno + 1
 def main():
     # Argument parsing #################################################################
     args = get_args()
@@ -184,20 +142,7 @@ def main():
         debug_image = copy.deepcopy(image)
 
         face_rec_image = copy.deepcopy(image)
-        # rgb_img = cv2.cvtColor(face_rec_image, cv2.COLOR_BGR2RGB)
-        # img_encoding = face_recognition.face_encodings(rgb_img)[0]
-        # match = False
-        # for file in os.listdir("C:\\Users\\aweso\\PycharmProjects\\hand-gesture-recognition-mediapipe-main\\images\\andy"):
-        #     print(os.getcwd() + "\\images\\andy\\" + file)
-        #     img2 = cv2.imread(os.getcwd() + "\\images\\andy\\" + file)
-        #     rgb_img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
-        #     img_encoding2 = face_recognition.face_encodings(rgb_img2)[0]
-        #
-        #     result = face_recognition.compare_faces([img_encoding], img_encoding2)
-        #     if result:
-        #         break
-        # if match == False:
-        #     sys.exit()
+
         # Detection implementation #############################################################
         image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
         with mp_face_mesh.FaceMesh(
@@ -628,7 +573,6 @@ def draw_info_text(image, brect, handedness, hand_sign_text,
                    finger_gesture_text, dist):
     cv.rectangle(image, (brect[0], brect[1]), (brect[2], brect[1] - 22),
                  (0, 0, 0), -1)
-    # print(volume.GetMasterVolumeLevel())
 
     info_text = handedness.classification[0].label[0:]
     if info_text == "Left":
@@ -637,10 +581,6 @@ def draw_info_text(image, brect, handedness, hand_sign_text,
             if dist >= 10 and dist <= 180:
                 dist = ((dist - 180) / 170) * (64.9)
                 print(dist)
-                try:
-                    volume.SetMasterVolumeLevel(dist, None)
-                except:
-                    print("Finger closed")
     # if info_text == "Right":
     #     if hand_sign_text == "Close":
     #         print("hi")
@@ -690,10 +630,6 @@ def draw_info(image, fps, mode, number):
                        cv.LINE_AA)
     return image
 def initHandDetection():
-    devices = AudioUtilities.GetSpeakers()
-    interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-    global volume
-    volume = cast(interface, POINTER(IAudioEndpointVolume))
     main()
 
 if __name__ == '__main__':
